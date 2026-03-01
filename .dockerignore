@@ -1,0 +1,26 @@
+# VCS / CI
+.git
+.github
+
+# Dependencies
+node_modules
+client/node_modules
+
+# Local env and editor
+.env
+.env.*
+!.env.example
+.vscode
+.idea
+
+# Build/test artifacts
+coverage
+.nyc_output
+client/dist
+dist
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

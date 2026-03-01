@@ -1,0 +1,276 @@
+{
+  "emergency_dashboard_apis": {
+    "weather_and_natural_disasters": [
+      {
+        "id": "noaa-nws-alerts",
+        "source_id": "noaa_nws",
+        "enabled_by_default": false,
+        "name": "NOAA / National Weather Service",
+        "description": "US weather alerts, warnings, watches in real-time",
+        "base_url": "https://api.weather.gov",
+        "endpoints": {
+          "all_alerts": "https://api.weather.gov/alerts/active",
+          "alerts_by_area": "https://api.weather.gov/alerts/active?area={state_code}",
+          "forecast": "https://api.weather.gov/points/{lat},{lon}"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "GeoJSON",
+        "coverage": "USA",
+        "free": true,
+        "polling_interval_minutes": 5
+      },
+      {
+        "id": "open-meteo",
+        "source_id": "open_meteo",
+        "enabled_by_default": false,
+        "name": "Open-Meteo",
+        "description": "Free global weather forecast API, no key needed",
+        "base_url": "https://api.open-meteo.com/v1",
+        "endpoints": {
+          "forecast": "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "JSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 15
+      },
+      {
+        "id": "openweathermap",
+        "source_id": "openweathermap",
+        "enabled_by_default": false,
+        "name": "OpenWeatherMap",
+        "description": "Global weather, alerts, forecasts",
+        "base_url": "https://api.openweathermap.org/data/2.5",
+        "endpoints": {
+          "current": "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}",
+          "alerts": "https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}"
+        },
+        "auth_required": true,
+        "api_key_required": true,
+        "format": "JSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 10
+      }
+    ],
+    "earthquakes": [
+      {
+        "id": "usgs-earthquake-hazards",
+        "source_id": "usgs_earthquakes",
+        "enabled_by_default": true,
+        "name": "USGS Earthquake Hazards",
+        "description": "Real-time global earthquake data",
+        "base_url": "https://earthquake.usgs.gov/fdsnws/event/1",
+        "endpoints": {
+          "recent_earthquakes": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=100&orderby=time",
+          "significant_week": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_week.geojson",
+          "all_hour": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson",
+          "all_day": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "GeoJSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 5
+      }
+    ],
+    "multi_hazard_natural_events": [
+      {
+        "id": "nasa-eonet",
+        "source_id": "nasa_eonet",
+        "enabled_by_default": false,
+        "name": "NASA EONET",
+        "description": "Natural events tracker: wildfires, storms, volcanoes, floods",
+        "base_url": "https://eonet.gsfc.nasa.gov/api/v3",
+        "endpoints": {
+          "open_events": "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=50",
+          "all_events": "https://eonet.gsfc.nasa.gov/api/v3/events"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "JSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 30
+      },
+      {
+        "id": "gdacs-rss",
+        "source_id": "gdacs_rss",
+        "enabled_by_default": false,
+        "name": "GDACS",
+        "description": "Global Disaster Alert & Coordination System multi-hazard RSS feeds",
+        "base_url": "https://www.gdacs.org",
+        "endpoints": {
+          "all_alerts": "https://www.gdacs.org/xml/rss.xml",
+          "earthquakes": "https://www.gdacs.org/xml/rss_eq.xml",
+          "floods": "https://www.gdacs.org/xml/rss_fl.xml"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "RSS / XML",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 15
+      }
+    ],
+    "humanitarian_disasters": [
+      {
+        "id": "fema-api",
+        "source_id": "fema_api",
+        "enabled_by_default": false,
+        "name": "FEMA API",
+        "description": "US disaster declarations and emergency data",
+        "base_url": "https://www.fema.gov/api/open/v2",
+        "endpoints": {
+          "disaster_declarations": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$top=50"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "JSON",
+        "coverage": "USA",
+        "free": true,
+        "polling_interval_minutes": 60
+      }
+    ],
+    "wildfires": [
+      {
+        "id": "nasa-firms",
+        "source_id": "nasa_firms",
+        "enabled_by_default": false,
+        "name": "NASA FIRMS",
+        "description": "Active fire and thermal anomaly data from satellites",
+        "base_url": "https://firms.modaps.eosdis.nasa.gov/api",
+        "endpoints": {
+          "active_fires": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_SNPP_NRT/{area}/{days}",
+          "world_fires_24h": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/MODIS_NRT/world/1"
+        },
+        "auth_required": true,
+        "api_key_required": true,
+        "format": "CSV / JSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 60
+      }
+    ],
+    "air_quality": [
+      {
+        "id": "openaq",
+        "source_id": "openaq",
+        "enabled_by_default": false,
+        "name": "OpenAQ",
+        "description": "Real-time global air quality measurements",
+        "base_url": "https://api.openaq.org/v3",
+        "endpoints": {
+          "latest_measurements": "https://api.openaq.org/v3/locations?limit=100"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "JSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 15
+      },
+      {
+        "id": "airnow",
+        "source_id": "airnow",
+        "enabled_by_default": false,
+        "name": "AirNow",
+        "description": "US air quality index and fire smoke data",
+        "base_url": "https://www.airnowapi.org/aq",
+        "endpoints": {
+          "current_aqi": "https://www.airnowapi.org/aq/observation/latLong/current/?latitude={lat}&longitude={lon}&distance=50&format=application/json&API_KEY={API_KEY}"
+        },
+        "auth_required": true,
+        "api_key_required": true,
+        "format": "JSON",
+        "coverage": "USA",
+        "free": true,
+        "polling_interval_minutes": 30
+      }
+    ],
+    "health_and_disease_outbreaks": [
+      {
+        "id": "who-don-rss",
+        "source_id": "who_don_rss",
+        "enabled_by_default": false,
+        "name": "WHO Disease Outbreak News",
+        "description": "Official WHO outbreak and epidemic announcements",
+        "base_url": "https://www.who.int",
+        "endpoints": {
+          "disease_outbreak_news": "https://www.who.int/feeds/entity/csr/don/en/rss.xml"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "RSS / XML",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 60
+      },
+      {
+        "id": "cdc-media-rss",
+        "source_id": "cdc_media",
+        "enabled_by_default": false,
+        "name": "CDC Media RSS",
+        "description": "US CDC health alerts and public health emergency notices",
+        "base_url": "https://tools.cdc.gov/api/v2",
+        "endpoints": {
+          "health_alerts": "https://tools.cdc.gov/api/v2/resources/media?topic=All&format=json"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "JSON",
+        "coverage": "USA",
+        "free": true,
+        "polling_interval_minutes": 60
+      }
+    ],
+    "wars_and_conflicts": [
+      {
+        "id": "ucdp",
+        "source_id": "ucdp",
+        "enabled_by_default": false,
+        "name": "UCDP",
+        "description": "Academic global armed conflict data",
+        "base_url": "https://ucdpapi.pcr.uu.se/api",
+        "endpoints": {
+          "gedevents": "https://ucdpapi.pcr.uu.se/api/gedevents/23.1?pagesize=100"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "JSON",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 1440
+      },
+      {
+        "id": "gdacs-complex-emergencies",
+        "source_id": "gdacs_complex_emergencies",
+        "enabled_by_default": false,
+        "name": "GDACS Conflict / Complex Emergency Feed",
+        "description": "Complex and humanitarian emergency RSS feed",
+        "base_url": "https://www.gdacs.org",
+        "endpoints": {
+          "complex_emergencies": "https://www.gdacs.org/xml/rss_ce.xml"
+        },
+        "auth_required": false,
+        "api_key_required": false,
+        "format": "RSS / XML",
+        "coverage": "Global",
+        "free": true,
+        "polling_interval_minutes": 60
+      }
+    ]
+  },
+  "meta": {
+    "last_updated": "2026-03-01",
+    "notes": [
+      "Catalog includes open/free sources by default",
+      "Catalog can include unsupported feeds; backend adapters determine live layers",
+      "Refresh button can force bypass server cache"
+    ]
+  }
+}

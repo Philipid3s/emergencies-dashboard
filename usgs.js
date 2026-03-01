@@ -1,64 +1,55 @@
-var fetch = require("node-fetch");
+const { fetchJsonWithRetry } = require('./upstreamClient');
 
-const date_options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+const dateOptions = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+};
+
+const ALERT_LEVELS = new Set(['green', 'yellow', 'orange', 'red']);
+
+function formatDateForApi(date) {
+  return date.toISOString().slice(0, 10);
+}
 
 class USGS {
-
   constructor(dateFrom, dateTo) {
-    this.earthquakes = [];
-
-    var dd1 = dateFrom.getDate();
-    var mm1 = dateFrom.getMonth()+1; //January is 0!
-    var yyyy1 = dateFrom.getFullYear();
-
-    var dd2 = dateTo.getDate();
-    var mm2 = dateTo.getMonth()+1; //January is 0!
-    var yyyy2 = dateTo.getFullYear();
-
-    this.url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${yyyy1}-${mm1}-${dd1}&endtime=${yyyy2}-${mm2}-${dd2}`;
+    const start = formatDateForApi(dateFrom);
+    const end = formatDateForApi(dateTo);
+    this.url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${start}&endtime=${end}`;
   }
 
-  json() {
-    return JSON.stringify(this.earthquakes);
-  }
+  toEarthquake(data) {
+    const eventTime = data?.properties?.time;
+    const coordinates = data?.geometry?.coordinates;
 
-  addEarthquake(data) {
-    let date = new Date(data.properties.time);
-
-    let earthquake = {
-      type: data.properties.type.toLowerCase(),
-      datetime: data.properties.time,
-      date: date.toLocaleDateString('EN-en', date_options),
-      coordinates: [data.geometry.coordinates[1], data.geometry.coordinates[0]],
-      title :data.properties.title,
-      level: data.properties.alert,
-      url: data.properties.url
+    return {
+      type: (data?.properties?.type || 'earthquake').toLowerCase(),
+      datetime: eventTime,
+      date: eventTime ? new Date(eventTime).toLocaleDateString('en-US', dateOptions) : null,
+      coordinates: Array.isArray(coordinates) ? [coordinates[1], coordinates[0]] : null,
+      title: data?.properties?.title || 'Untitled earthquake',
+      level: data?.properties?.alert || null,
+      url: data?.properties?.url || null,
+      magnitude: data?.properties?.mag ?? null
     };
-
-    this.earthquakes.push(earthquake);
-    return `[earthquakes] ${earthquake.title}`;
   }
 
   async loadEarthquakes() {
-    console.log('[earthquakes] loading...');
+    const json = await fetchJsonWithRetry(this.url, {
+      timeoutMs: 10000,
+      maxAttempts: 3,
+      retryDelayMs: 400
+    });
 
-    let json = await(await fetch(this.url)).json();
+    const features = Array.isArray(json.features) ? json.features : [];
 
-    await Promise.all(json.features.map(data => {
-                      if (data.properties.alert == 'green' ||
-                          data.properties.alert == 'yellow'||
-                          data.properties.alert == 'orange'||
-                          data.properties.alert == 'red')
-                          {
-                            const result = this.addEarthquake(data);
-                            console.log(result);
-                          }
-                  }));
-
-    console.log('[earthquakes] loaded!');
-
-    return this.json();
+    return features
+      .filter((entry) => ALERT_LEVELS.has(entry?.properties?.alert))
+      .map((entry) => this.toEarthquake(entry))
+      .filter((entry) => Array.isArray(entry.coordinates) && entry.coordinates.length === 2);
   }
 }
 
-module.exports = USGS
+module.exports = USGS;
